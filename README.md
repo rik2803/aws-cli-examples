@@ -110,3 +110,6 @@ $ aws elbv2 describe-rules --query 'Rules[*].Priority' \
 ]
 ```
 
+## Links and Resources
+
+* [http://jmespath.org/tutorial.html](http://jmespath.org/tutorial.html)
