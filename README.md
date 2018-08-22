@@ -1,5 +1,80 @@
 # Real World AWS CLI Examples
 
+## AWS CloudWatch
+
+### CloudWatch events
+
+#### Disable
+
+```
+for rule in $(aws events list-rules --query "Rules[*]|[?starts_with(Name,'MyRules')].Name" --output text)
+do
+  aws events disable-rule ${rule}
+done
+```
+
+#### Enable
+
+```
+for rule in $(aws events list-rules --query "Rules[*]|[?starts_with(Name,'MyRules')].Name" --output text)
+do
+  aws events enable-rule ${rule}
+done
+```
+
+### Disable all CloudWatch alarms that start with a given string
+
+#### Build the list of alarms
+
+```
+$ aws cloudwatch describe-alarms \
+  --query "MetricAlarms[*]|[?starts_with(AlarmName, 'MyAlarm')].AlarmName"
+[
+    "MyAlarm-001-G1OKLD8WV8AX",
+    "MyAlarm-002-AE2QOMTSW0CL",
+    "MyAlarm-003-1VXVS2R470KSH",
+    "MyAlarm-004-1LSTE90T9SV8P",
+    "MyAlarm-005-1TG83Q2W9WWFH",
+    "MyAlarm-006-1RINGKR9BW8RX",
+    "MyAlarm-007-14Y6GIY66F88C",
+    "MyAlarm-008-M8QBJWRE19HT"
+]
+```
+
+Next, add the `--output text` option to have all _AlarmNames_ as a string on a singel line of output:
+
+```
+$ aws cloudwatch describe-alarms \
+  --output text \
+  --query "MetricAlarms[*]|[?starts_with(AlarmName, 'MyAlarm')].AlarmName"
+MyAlarm-001-G1OKLD8WV8AX MyAlarm-002-AE2QOMTSW0CL MyAlarm-003-1VXVS2R470KSH MyAlarm-004-1LSTE90T9SV8P MyAlarm-005-1TG83Q2W9WWFH MyAlarm-006-1RINGKR9BW8RX MyAlarm-007-14Y6GIY66F88C MyAlarm-008-M8QBJWRE19HT
+```
+
+#### Disable the alarms
+
+Bringing the above into the command `aws cloudwatch disable-alarm-actions` yields in:
+
+```
+$ MY_ALARMS=$(aws cloudwatch describe-alarms \
+  --output text \
+  --query "MetricAlarms[*]|[?starts_with(AlarmName, 'MyAlarm')].AlarmName")
+$ aws cloudwatch disable-alarm-actions --alarm-names ${MY_ALARMS}
+```
+
+## AWS Certificate Manager
+
+### List the DNS verification records for a given certificate
+
+```bash
+aws acm describe-certificate \
+  --certificate-arn arn:aws:acm:eu-central-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx \
+  --query '[Certificate.DomainValidationOptions][0][*].ResourceRecord.[Name, Value]' \
+  --output text
+_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.example.com. _yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy.acm-validations.aws.
+_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.example.be. _yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy.acm-validations.aws.
+_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.example.eu. _yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy.acm-validations.aws.
+
+```
 ## AWS CloudFormation
 
 ### List CloudFormation Stacks
@@ -113,3 +188,4 @@ $ aws elbv2 describe-rules --query 'Rules[*].Priority' \
 ## Links and Resources
 
 * [http://jmespath.org/tutorial.html](http://jmespath.org/tutorial.html)
+* [Advanced AWS CLI JMESPATH queries](https://opensourceconnections.com/blog/2015/07/27/advanced-aws-cli-jmespath-query/)
