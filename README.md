@@ -185,6 +185,17 @@ $ aws elbv2 describe-rules --query 'Rules[*].Priority' \
 ]
 ```
 
+## RDS
+
+### RDS Snapshots
+
+#### Retrieve the ARN of the most recent DB Snapshot
+
+```bash
+$ aws rds describe-db-snapshots  --query 'reverse(sort_by(DBSnapshots,&SnapshotCreateTime))[0].[DBSnapshotArn][0]' --output text
+arn:aws:rds:eu-central-1:123456789012:snapshot:rds:my-db-id-2018-08-26-02-35
+```
+
 ## Links and Resources
 
 * [http://jmespath.org/tutorial.html](http://jmespath.org/tutorial.html)
