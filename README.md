@@ -1,5 +1,26 @@
 # Real World AWS CLI Examples
 
+## Route 53
+
+### Dump all records for a _Zone_ in a readable format
+
+```bash
+aws route53 list-resource-record-sets \
+  --hosted-zone-id Z2L52Z1C7UYKOW \
+  --query 'ResourceRecordSets[*].[Name, Type, TTL, ResourceRecords[0].Value]' \
+  --output text
+```
+
+The result will look like this:
+
+```bash
+woodpecker.acme.com.        CNAME   300     woody.acme.com
+bugs.acme.com.       CNAME   300     bunny.acme.com
+daffy.acme.com.     A       300     12.13.14.15
+duck.acme.com.       A       300     11.22.33.44
+sylvester.acme.com.       A       300     55.66.77.88
+```
+
 ## AWS CloudWatch
 
 ### CloudWatch events
@@ -192,7 +213,9 @@ $ aws elbv2 describe-rules --query 'Rules[*].Priority' \
 #### Retrieve the ARN of the most recent DB Snapshot
 
 ```bash
-$ aws rds describe-db-snapshots  --query 'reverse(sort_by(DBSnapshots,&SnapshotCreateTime))[0].[DBSnapshotArn][0]' --output text
+$ aws rds describe-db-snapshots \
+    --query 'reverse(sort_by(DBSnapshots,&SnapshotCreateTime))[0].[DBSnapshotArn][0]' \
+    --output text
 arn:aws:rds:eu-central-1:123456789012:snapshot:rds:my-db-id-2018-08-26-02-35
 ```
 
