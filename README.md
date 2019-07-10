@@ -219,6 +219,17 @@ $ aws rds describe-db-snapshots \
 arn:aws:rds:eu-central-1:123456789012:snapshot:rds:my-db-id-2018-08-26-02-35
 ```
 
+## SSM
+
+### Retrieve the AMI `image_id` for the recommended ECS AMI
+
+```
+$ aws ssm get-parameters-by-path \
+    --path /aws/service/ecs/optimized-ami/amazon-linux-2/recommended \
+    --query "Parameters[*]|[?contains(Name, 'image_id')][Value]" --output text
+ami-09577c19fbe1bd7fa
+```
+
 ## Links and Resources
 
 * [http://jmespath.org/tutorial.html](http://jmespath.org/tutorial.html)
