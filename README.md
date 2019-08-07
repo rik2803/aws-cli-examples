@@ -132,16 +132,23 @@ DevRoute53	CREATE_COMPLETE
 
 ## S3
 
+### Get the _canonical id_ for an AWS account
+
+```bash
+$ aws s3api list-buckets --query Owner.ID
+"lkdfjgiewoirlkqejfflkjdlkfjsdlkfasjdlfkjasdfktkbhdkkfkjhfkasjdhf"
+```
+
 ### Get a list of all S3 buckets in an account
 
-```
+```bash
 $ aws s3api list-buckets --query 'Buckets[*].Name' --output text
 bucket_01 bucket_02 ....
 ```
 
 ### Enable AES-256 encryption on a bucket
 
-```
+```bash
 $ aws s3api put-bucket-encryption --bucket bucketname \
                                   --server-side-encryption-configuration '{ "Rules": [ { "ApplyServerSideEncryptionByDefault": { "SSEAlgorithm": "AES256" } } ] }'
 ```
@@ -151,7 +158,7 @@ $ aws s3api put-bucket-encryption --bucket bucketname \
 
 Remember that this not change existing object. Only newly created objects n the bucket will be encrypted.
 
-```
+```bash
 for bucket in $(aws s3api list-buckets --query 'Buckets[*].Name' --output text)
 do
   aws s3api put-bucket-encryption --bucket ${bucket} \
@@ -165,7 +172,7 @@ done
 
 #### Step 1: Find loadbalancer arn
 
-```
+```bash
 $ aws elbv2 describe-load-balancers --query 'LoadBalancers[*].LoadBalancerArn'
 [
     "arn:aws:elasticloadbalancing:eu-central-1:123456789012:loadbalancer/app/lb-dev-ALBExt/2976f0dc67ff78d2",
@@ -176,7 +183,7 @@ $ aws elbv2 describe-load-balancers --query 'LoadBalancers[*].LoadBalancerArn'
 #### Step 2: Find the listener arn
 
 
-```
+```bash
 $ aws elbv2 describe-listeners --query 'Listeners[*].ListenerArn' \
      --load-balancer-arn arn:aws:elasticloadbalancing:eu-central-1:123456789012:loadbalancer/app/lb-dev-ALBExt/2976f0dc67ff78d2
 [
@@ -187,7 +194,7 @@ $ aws elbv2 describe-listeners --query 'Listeners[*].ListenerArn' \
 
 #### Step 3: List the listener rules and print the priority
 
-```
+```bash
 $ aws elbv2 describe-rules --query 'Rules[*].Priority' \
    --listener-arn arn:aws:elasticloadbalancing:eu-central-1:123456789012:listener/app/lb-dev-ALBExt/2976f0dc67ff78d2/6536d2cca73d2452`
 [
@@ -223,7 +230,7 @@ arn:aws:rds:eu-central-1:123456789012:snapshot:rds:my-db-id-2018-08-26-02-35
 
 ### Retrieve the AMI `image_id` for the recommended ECS AMI
 
-```
+```bash
 $ aws ssm get-parameters-by-path \
     --path /aws/service/ecs/optimized-ami/amazon-linux-2/recommended \
     --query "Parameters[*]|[?contains(Name, 'image_id')][Value]" --output text
