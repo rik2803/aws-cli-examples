@@ -1,5 +1,32 @@
 # Real World AWS CLI Examples
 
+## IAM
+
+### Assume a role on another account and set environment
+
+```bash
+eval $(
+        aws sts assume-role \
+          --role-arn arn:aws:iam::123456789012:role/role_to_assume \
+          --role-session-name lskjfdsljfsldfkj | \
+        jq  -r '"export AWS_ACCESS_KEY_ID=\"" + .Credentials.AccessKeyId + "\"",
+                "export AWS_SECRET_ACCESS_KEY=\"" + .Credentials.SecretAccessKey + "\"",
+                "export AWS_SESSION_TOKEN=\"" + .Credentials.SessionToken + "\""'
+)
+```
+
+After the above command succesfully executes, the environment variables
+`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `AWS_SESSION_TOKEN`
+are set and the AWS CLI can be used for actions covered by the permissions
+granted by the role on the remote account.
+
+```bash
+$ set | grep AWS_
+AWS_ACCESS_KEY_ID=ASIAZZZZZZZZZZZZ
+AWS_SECRET_ACCESS_KEY=sflkdjfsldkfjsdlkfsjdflksjdflsdj
+AWS_SESSION_TOKEN=dfskjldjs....slkdjfsldjfs
+```
+
 ## Route 53
 
 ### Dump all records for a _Zone_ in a readable format
