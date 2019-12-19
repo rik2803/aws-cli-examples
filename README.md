@@ -193,6 +193,14 @@ do
 done
 ```
 
+### Retrieve the value of a named tag on a S3 object
+
+```bash
+aws s3api get-object-tagging \
+  --bucket ${S3_BUCKET} \
+  --key ${S3_KEY} --query "TagSet[*]|[?Key == 'KEYNAME'].Value" --output text
+```
+
 ## ELBv2
 
 ### Show listener rules
