@@ -1,5 +1,27 @@
 # Real World AWS CLI Examples
 
+
+## ECS
+
+### Get the latest task definition for a task family
+
+```
+$ aws ecs list-task-definitions --family-prefix task-family-prefix --query 'taskDefinitionArns[-1:]' --output text
+arn:aws:ecs:eu-central-1:123456789012:task-definition/task-family-prefix:47
+```
+
+### Get the image used by a container in a task definition
+
+For a given task definiton, I want to know the image used the container named `my-container`.
+
+```
+$ aws ecs describe-task-definition \
+    --task-definition arn:aws:ecs:eu-central-1:123456789012:task-definition/task-family-prefix:47 \
+    --query "taskDefinition.containerDefinitions[?name=='my-container'].[image][]" --output text
+234567890121.dkr.ecr.eu-central-1.amazonaws.com/my-image:my-tag
+```
+
+
 ## IAM
 
 ### Assume a role on another account and set environment
@@ -147,14 +169,32 @@ $ aws cloudformation list-stacks
 
 #### List stacks with status `CREATE_COMPLETE`:
 
-
 ```bash
-$ aws cloudformation list-stacks --query "StackSummaries[?StackStatus=='CREATE_COMPLETE'].[StackName, StackStatus]" --output text
+$ aws cloudformation list-stacks \
+    --query "StackSummaries[?StackStatus=='CREATE_COMPLETE'].[StackName, StackStatus]" \
+    --output text
 DevECS	CREATE_COMPLETE
 DevLBALBInt	CREATE_COMPLETE
 SecuritySubaccount	CREATE_COMPLETE
 BastionForDev	CREATE_COMPLETE
 DevRoute53	CREATE_COMPLETE
+```
+
+#### List stacks with status `CREATE_COMPLETE` and name starting with a certain string:
+
+```bash
+$ aws cloudformation list-stacks \
+    --query "StackSummaries[?StackStatus=='CREATE_COMPLETE']|[?(starts_with(StackName, 'TstSand'))].[StackName, StackStatus]" \
+    --output text
+TstSandCloudFront       CREATE_COMPLETE
+TstSandS3       CREATE_COMPLETE
+TstSandLBALBExt CREATE_COMPLETE
+TstSandCW       CREATE_COMPLETE
+TstSandLambda   CREATE_COMPLETE
+TstSandIAM      CREATE_COMPLETE
+TstSandECSMgmt  CREATE_COMPLETE
+TstSandBastion  CREATE_COMPLETE
+TstSandVPCEndpoint      CREATE_COMPLETE
 ```
 
 ## S3
